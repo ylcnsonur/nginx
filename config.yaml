@@ -28,11 +28,32 @@ metadata:
   name: nginx-service
   namespace: default
 spec:
-  type: LoadBalancer
-  loadBalancerIP: 10.10.10.180
+  type: ClusterIP
   selector:
     app: nginx
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: sorularla.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
